@@ -185,6 +185,17 @@
   psql -h$gphost -U$gpuser -p$gpport -d $gpdatabase -c "\copy $gptable from '$1/$file'"
   ```
 
+- PSQL 快捷指令
+
+  ```
+  \l    列举数据库
+  \c    选择/切换数据库
+  \dt   查看某个库中的所有表
+  \d    查看表结构
+  \q    退出 psql
+  
+  ```
+
   
 
 
@@ -263,6 +274,18 @@ https://pypi.tuna.tsinghua.edu.cn/simple/pip/
 # setuptools
 https://pypi.tuna.tsinghua.edu.cn/simple/setuptools/
 ```
+
+
+
+
+
+### Pycharm 快捷键
+
+```
+批量注释    Ctrl+/
+```
+
+
 
 ### Pychram 设置环境与导出环境
 
