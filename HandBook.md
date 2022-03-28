@@ -1,9 +1,5 @@
 # Handbook
 
-# 常用命令及配置大全
-
-
-
 ## Linux
 
 - 查看 Java 程序堆内存使用情况
@@ -71,7 +67,42 @@
     $ source /etc/profile
   ```
 
-  
+
+
+### Linux 标准输出、错误输出、标准输入
+
+| 数字 | 含义         | 标准叫法                 |
+| ---- | ------------ | ------------------------ |
+| 0    | 标准输入     | stdin = standard input   |
+| 1    | 标准输出     | stdout = standard output |
+| 2    | 标准错误输出 | stderr = standard error  |
+
+一些重定向的用法
+
+```shell
+1.想要把make输出的全部信息，输出到某个文件中，最常见的办法就是：
+make xxx > build_output.txt
+此时默认情况是没有改变2=stderr的输出方式，还是屏幕，所以，如果有错误信息，还是可以在屏幕上看到的。
+
+2.只需要把make输出中的错误（及警告）信息输出到文件中ing，可以用：
+make xxx 2> build_output.txt
+相应地，由于1=stdout没有变，还是屏幕，所以，那些命令执行时候输出的正常信息，还是会输出到屏幕上，你还是可以在屏幕上看到的。
+
+3.只需要把make输出中的正常（非错误，非警告）的信息输出到文件中，可以用：
+make xxx 1> build_output.txt
+相应地，由于2=stderr没有变，还是屏幕，所以，那些命令执行时候输出的错误信息，还是会输出到屏幕上，你还是可以在屏幕上看到的。
+
+4.想要把正常输出信息和错误信息输出到分别的文件中，可以用：
+make xxx 1> build_output_normal.txt 2>build_output_error.txt
+即联合使用了1和2，正常信息和错误信息，都输出到对应文件中了。
+
+5. 所有的信息都输出到同一个文件中：
+make xxx > build_output_all.txt 2>&1
+其中的2>&1表示错误信息输出到&1中，而&1，指的是前面的那个文件：build_output_all.txt 。
+注意：上面所有的1,2等数字，后面紧跟着大于号'>' ，中间不能有空格
+```
+
+
 
 
 
@@ -298,28 +329,54 @@ kafka-consumer-groups.sh --bootstrap-server rhino221:9092 --group zww_topic_grou
 
 ## Python
 
-```
-# 导出当前 Python 环境到一个文件
-pip freeze > requirements.txt
-# 下载 Python 环境的所有包到一个目录
-pip download -d C:\Users\Administrator\Desktop\我的脚本\ZTCHS_Checker\pack -r requirements.txt# 导出当前 Python 环境到一个文件
-pip freeze > requirements.txt
-# 下载 Python 环境的所有包到一个目录
-pip download -d C:\Users\Administrator\Desktop\我的脚本\ZTCHS_Checker\pack -r requirements.txt
-# 指定清华镜像站，下载包到一个指定目录
-pip download -d C:\Users\Administrator\Desktop\我的脚本\ZTCHS_Checker\pack -i https://pypi.tuna.tsinghua.edu.cn/simple setuptools
-# 使用清华镜像站更新一个包
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U
-
-```
-
-清华pypi镜像部分包的直接地址
+### 清华pypi镜像部分包的直接地址
 
 ```
 # pip
 https://pypi.tuna.tsinghua.edu.cn/simple/pip/
 # setuptools
 https://pypi.tuna.tsinghua.edu.cn/simple/setuptools/
+```
+
+
+
+### namedtuple 用法
+
+> **namedtuple是继承自tuple的子类。namedtuple创建一个和tuple类似的对象，而且对象拥有可访问的属性。**
+>
+> 因为元组的局限性：不能为元组内部的数据进行命名，所以往往我们并不知道一个元组所要表达的意义，
+> 所以在这里引入了 collections.namedtuple 这个工厂函数，来构造一个带字段名的元组。
+> 具名元组的实例和普通元组消耗的内存一样多，因为字段名都被存在对应的类里面。这个类跟普通的对象
+> 实例比起来也要小一些，因为 Python 不会用 __dict__ 来存放这些实例的属性。
+
+实现方法
+
+```python
+from collections import namedtuple
+```
+
+源代码
+
+![img](HandBook/70.png)
+
+用法示例
+
+```python
+def namedtuple(typename, field_names, *, verbose=False, rename=False, module=None):
+#    - typename: 元组名称
+#    - field_names : 元组中元素的名称
+#    - rename: 如果元素名称中包含python关键字， 必须设置rename=True
+```
+
+```python
+from collections import  namedtuple
+
+User = namedtuple('User', ['name', 'age', 'gender'])
+u = User('villa', 33, 'male')
+print(u.name)
+print(u.age)
+print(u.gender)
+print(u)
 ```
 
 
@@ -389,6 +446,27 @@ t：文本模式（默认值，与其他模式结合使用）
 r+： 打开文件进行读写，会覆盖文件原内容，重新写入；若文件不存在，则会报错
 w+：打开一个文件用于读写。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被删除。如果该文件不存在，创建新文件
 a+：打开一个文件用于读写。如果该文件已存在，文件指针将会放在文件的结尾。文件打开时会是追加模式。如果该文件不存在，创建新文件用于读写。
+```
+
+
+
+### pip 命令
+
+```
+pip [download/install]
+ -i: 指定下载源
+ -d: 指定下载目录
+# 导出当前 Python 环境到一个文件
+pip freeze > requirements.txt
+# 下载 Python 环境的所有包到一个目录
+pip download -d C:\Users\Administrator\Desktop\我的脚本\ZTCHS_Checker\pack -r requirements.txt# 导出当前 Python 环境到一个文件
+pip freeze > requirements.txt
+# 下载 Python 环境的所有包到一个目录
+pip download -d C:\Users\Administrator\Desktop\我的脚本\ZTCHS_Checker\pack -r requirements.txt
+# 指定清华镜像站，下载包到一个指定目录
+pip download -d C:\Users\Administrator\Desktop\我的脚本\ZTCHS_Checker\pack -i https://pypi.tuna.tsinghua.edu.cn/simple setuptools
+# 使用清华镜像站更新一个包
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U
 ```
 
 
@@ -472,6 +550,56 @@ U / :U：撤销单行内的所有修改
 
 
 
+##  Git
 
-##  Linux
+### 常用命令
+
+```shell
+# 从版本库中删除某个文件
+|-- git rm xxx
+|-- git commit -m " remove xxx"
+```
+
+
+
+ ### .gitignore 文件
+
+- 配置示例
+
+  ```
+  # 忽略 .a 文件
+  *.a
+  
+  # 但否定忽略 lib.a, 尽管已经在前面忽略了 .a 文件
+  !lib.a
+  
+  # 仅在当前目录下忽略 TODO 文件， 但不包括子目录下的 subdir/TODO
+  /TODO
+  
+  # 忽略 build/ 文件夹下的所有文件
+  build/
+  
+  # 忽略 doc/notes.txt, 不包括 doc/server/arch.txt
+  doc/*.txt
+  
+  # 忽略所有的 .pdf 文件 在 doc/ directory 下的
+  doc/**/*.pdf
+  ```
+
+- 配置模板
+
+  ```
+  Github 上为开发者提供了各种环境以及各种编程语言的 gitignore 文件配置模板：https://github.com/github/gitignore
+  python项目的gitgnore文件 url:https://github.com/github/gitignore/blob/master/Python.gitignore
+  ```
+
+- 全局`.gitignore`设置方法( 这个文件将作用于所有 git 项目，并且作用于项目实例中的所有被跟踪的目录)
+
+  ```
+  git config --global core.excludesfile ~/.gitignore
+  ```
+
+- 局部`.gitignore`直接在项目目录中创建文件即可
+
+
 
