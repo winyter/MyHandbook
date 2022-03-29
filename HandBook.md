@@ -104,6 +104,63 @@ make xxx > build_output_all.txt 2>&1
 
 
 
+### vm.overcommit_memory & vm.overcommit_ratio
+
+overcommit_memory: 有三个值可以配置
+- 0: 用户申请内存的时候，系统会判断剩余的内存多少，如果不够的话那么就会失败
+- 1: 用户申请内存的时候，系统不进行任何检查任务内存足够用，直到使用内存超过可用内存
+- 2: 用户一次申请的内存大小不允许超过可用内存的大小
+
+overcommit_ratio: 仅当 overcommit_memory 为 2 时，该参数才会生效，这个参数决定了系统可用内存的大小
+
+计算公式:
+
+```
+(Physical-RAM-Size）* ratio / 100 + (Swap-Size)
+  Physical-RAM-Size: 物理内存大小，具体为 free 命令回显中 Mem 行 Total 列的值
+  Swap-Size: swap 内存大小，具体为 free 命令回显中 Swap 行 Total 列的值
+  ratio: 即 overcommit_ratio 参数的配置值
+```
+
+
+
+### shell 异常处理的几个方法
+
+1. 判断命令返回值
+
+   ```shell
+   #!/bin/sh
+   cd /home/xxxx/
+   if [ "$?"= "0" ]; then
+      rm -rf *
+   else
+      echo "cannot change directory" 1>&2
+      exit 1
+   fi 
+   ```
+
+2. && 和 ||
+
+   &&: 只有在shell1返回0（即正常）时，shell2才会执行，否则shell2根本就不执行
+
+   ||: 在shell1执行失败时，shell2才会执行，否则shell2是不执行的
+
+   ```shell
+   cd /home/xxxx/ && rm -rf *
+   cd /home/xxxx || error_exit "Cannot change directory"
+   rm -rf *
+   
+   -------
+   function error_exit {
+     echo "$1" 1>&2
+     exit 1
+   }
+   ```
+
+3. trap
+
+   
+
 
 
 ## MySQL
