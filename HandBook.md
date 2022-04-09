@@ -159,7 +159,28 @@ overcommit_ratio: 仅当 overcommit_memory 为 2 时，该参数才会生效，�
 
 3. trap
 
-   
+
+
+
+### Linux 内存管理之 RSS 和 VSZ
+
+**RSS**( Resident Set Size )：常驻内存集合大小。表示相应进程在 RAM 中占用了多少内存，并不包含在 SWAP 中占用的虚拟内存。即使是在内存中的使用了共享库的内存大小也一并计算在内，包含了完整在 stack 和 heap 中的内存
+
+**VSZ**( Virtual Memory Size)：虚拟内存大小。表明了该进程可以访问的所有内存，包括被交换的内存和共享库内存。
+
+eg. 如果进程A的二进制文件大小为500KB，并且链接到了2500KB的共享库，有200KB的stack/heap大小，这200KB中又有100KB位于内存中，100KB位于[SWAP](https://so.csdn.net/so/search?q=SWAP&spm=1001.2101.3001.7020)空间中，并且加载了1000KB的共享库和400KB的自身二进制文件。则
+
+​	RSS：400K + 1000K + 100K = 1500K
+
+​	VSZ：500K + 2500K + 200K = 3200K
+
+
+
+### Linux ps 命令详解
+
+
+
+
 
 
 
