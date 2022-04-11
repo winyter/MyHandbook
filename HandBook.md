@@ -176,9 +176,156 @@ eg. 如果进程A的二进制文件大小为500KB，并且链接到了2500KB的�
 
 
 
-### Linux ps 命令详解
+### ps 命令详解
+
+> Linux ps （英文全拼：process status）命令用于显示当前进程的状态，类似于 windows 的任务管理器。
+
+#### 基本内容
+
+- 语法
+
+  ```
+  ps [options] [--help]
+  ```
+
+- 参数
+
+  - ps 的参数非常多, 在此仅列出几个常用的参数并大略介绍含义
+
+  - -A 列出所有的进程
+
+  - -w 显示加宽可以显示较多的资讯
+
+  - -au 显示较详细的资讯
+
+  - -aux 显示所有包含其他使用者的进程
+
+#### ps -aux
+
+- au(x) 输出格式
+
+  ```
+  USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND
+  ```
+
+  - USER: 进程拥有者
+  - PID: 进程号
+  - %CPU: 占用的 CPU 使用率
+  - %MEM: 占用的内存使用率
+  - VSZ: 占用的虚拟内存大小
+  - RSS: 占用的内存大小
+  - TTY: 终端的次要装置号码 (minor device number of tty)
+  - STAT: 该进程的状态:
+    - D: 无法中断的休眠状态 (通常 IO 的进程)
+    - R: 正在执行中
+    - S: 静止状态
+    - T: 暂停执行
+    - Z: 不存在但暂时无法消除
+    - W: 没有足够的记忆体分页可分配
+    - <: 高优先序的行程
+    - N: 低优先序的行程
+    - L: 有记忆体分页分配并锁在记忆体内 (实时系统或捱A I/O)、
+  - START: 行程开始时间
+  - TIME: 执行的时间
+  - COMMAND:所执行的指令
 
 
+
+#### 实例
+
+查找指定进程格式：
+
+```
+ps -ef | grep 进程关键字
+```
+
+显示所有进程信息，连同命令行
+
+```
+ps -ef
+```
+
+显示进程信息：
+
+```
+ps -A 
+```
+
+显示指定用户信息
+
+```
+ps -u root //显示root进程用户信息
+```
+
+
+
+ 
+
+
+
+### sed 命令
+
+- sed 递归替换当前目录下所有文件，将 x 替换为 y
+
+  ```shell
+  find . -type f -print0 | xargs -0 sed -i "s/x/y/g"
+  ```
+
+
+
+
+
+### iconv 命令详解
+
+- 功能
+
+  对于给定文件，把它的内容从一种编码转换成另一种编码
+
+- 描述
+
+  -f encoding :把字符从encoding编码开始转换。 
+
+  -t encoding :把字符转换到encoding编码。 
+
+  -l :列出已知的编码字符集合 
+
+  -o file :指定输出文件 
+
+  -c :忽略输出的非法字符 
+
+  -s :禁止警告信息，但不是错误信息 
+
+  --verbose :显示进度信息 
+
+  -f和-t所能指定的合法字符在-l选项的命令里面都列出来了。 
+
+- 举例
+
+  列出当前支持的字符编码：
+
+  ```shell
+  iconv -l
+  ```
+
+  将文件file1转码,转后文件输出到fil2中： 
+
+  ```shell
+  iconv  -f EUC-JP-MS -t UTF-8 file1 -o file2   //没-o那么会输出到标准输出.
+  ```
+
+  实际需求，从hive中取出的数据是utf8的，要load到mysql中，gbk编码。所以在load之前要先对文件进行转码。
+
+  ```shell
+  mysql_cmd = "iconv -c -f utf-8 -t gbk ./data/al_ver_" + yesterday_time + ".xls -o ./data/GBK_al_ver_" + yesterday_time + ".xls "
+  print(mysql_cmd)
+  os.system(mysql_cmd)
+   
+  mysql_cmd = "mysql -h60.28.200.78 -uroot -pyeelion -A LogStat_RT  -e \"load data local  infile \'./data/GBK_al_ver_" + yesterday_time + ".xls ' into table HiveData_508\""
+  print(mysql_cmd)
+  os.system(mysql_cmd)
+  ```
+
+  
 
 
 
