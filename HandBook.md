@@ -239,6 +239,10 @@ overcommit_ratio: 仅当 overcommit_memory 为 2 时，该参数才会生效，�
 
 ## HBase
 
+```
+scan '202204', {FILTER => "SingleColumnValueFilter('cf','device_type',=,'binary:15000001')"}
+```
+
 
 
 
@@ -377,7 +381,7 @@ kafka-consumer-groups.sh --bootstrap-server rhino221:9092 --group zww_topic_grou
 登录命令
 
 ```
-./redis-cli -h ip -p port -a password
+./redis-cli -h ip -p port -a password -c
 ```
 
 
