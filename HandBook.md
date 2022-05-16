@@ -1242,6 +1242,40 @@ fuser -m /mnt 无法获取 /proc/4110/fd/255 的文件状态: 失效文件句柄
 
 
 
+### SFTP
+
+> sFTP（安全文件传输程序）是一种安全的交互式文件传输程序，其工作方式与 FTP（文件传输协议）类似。 然而，sFTP 比 FTP 更安全；它通过加密 SSH 传输处理所有操作。
+>
+> 它可以配置使用几个有用的 SSH 功能，如公钥认证和压缩。 它连接并登录到指定的远程机器，然后切换到交互式命令模式，在该模式下用户可以执行各种命令。
+
+#### 常用操作
+
+- SFTP 登录使用类似于 SSH 的密码方式，同时，为了安全并简化连接操作，也可以创建和使用 SSH 无密码登录
+
+- 为了防止用户访问远程主机上的整个文件系统，出于安全原因，你可以使用 chroot Jail将 sFTP 用户限制到其主目录中。
+
+- 常用命令
+
+  ```shell
+  # 登录命令
+  sftp user@ip
+  # 基本文件操作
+  sftp> ls            #list directory 
+  sftp> pwd           #print working directory on remote host 
+  sftp> lpwd          #print working directory on local host 
+  sftp> mkdir uploads     #create a new directory
+  # 上传文件夹，需要注意：上传时，需提前在远程主机上新建同名文件夹，否则上传会报错
+  sftp> put -r fold_name 
+  # 要保留修改时间、访问时间以及被传输的文件的模式，需添加 -p 参数
+  sftp> put -pr fold_name
+  # 下载文件夹
+  sftp> get -r fold_name
+  # 退出 sftp
+  sftp> bye  或  sftp> exit
+  ```
+
+  
+
 
 
 ## MySQL
