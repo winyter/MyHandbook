@@ -36,7 +36,7 @@
   dmidecode | grep -A16 "Memory Device" | grep 'Speed'
   ```
 
-- Linux 添加PATH 环境变量的几种方法（以添加 PYTHONPATH 为例）
+- Linux 添加 PATH 环境变量的几种方法（以添加 PYTHONPATH 为例）
 
   ```
   Linux下设置PYTHONPATH环境变量有三种方法：一种作用于当前终端，一种作用于当前用户，一种作用于所有用户。
@@ -66,6 +66,91 @@
     注1：需要执行如下命令后生效（或者注销后重新登陆）
     $ source /etc/profile
   ```
+
+
+
+### Linux 环境变量
+
+- Linux 环境变量文件
+
+  - 系统环境变量
+
+    **/etc/profile**：这个文件预设了几个重要的变量，例如PATH, USER, LOGNAME, MAIL, INPUTRC, HOSTNAME, HISTSIZE, umask等等
+
+    **/etc/bashrc**：这个文件主要预设umask以及PS1。这个PS1就是我们在敲命令时，前面那串字符了，例如 [root@localhost ~]#,当bash shell被打开时,该文件被读取
+
+  - 用户环境变量
+
+    **.bash_profile**：定义了用户的个人化路径与环境变量的文件名称。每个用户都可使用该文件输入专用于自己使用的shell信息,当用户登录时,该文件仅仅执行一次。（在这个文件中有执行.bashrc的脚本）
+
+    **.bashrc**：该文件包含专用于你的shell的bash信息,当登录时以及每次打开新的shell时,该该文件被读取。例如你可以将用户自定义的alias或者自定义变量写到这个文件中。
+
+    **.bash_history**：记录命令历史用的
+
+    **.bash_logout**：当退出shell时，会执行该文件。可以把一些清理的工作放到这个文件中
+
+
+
+### CentOS6 的启动引导过程
+
+1. 内核引导
+
+   当计算机打开电源后，首先是BIOS开机自检，按照BIOS中设置的启动设备（通常是硬盘）来启动。紧接着由启动设备上的grub程序开始引导Linux，当引导程序成功完成引导任务后，Linux从它们手中接管了CPU的控制权，然后CPU就开始执行Linux的核心映象代码，开始了Linux启动过程。也就是所谓的内核引导开始了，在内核引导过程中其实是很复杂的，我们就当它是一个黑匣子，反正是Linux内核做了一系列工作，最后内核调用加载了init程序，至此内核引导的工作就完成了。交给了下一个主角init.
+
+2. 运行init
+
+   init 进程是系统所有进程的起点，你可以把它比拟成系统所有进程的老祖宗，没有这个进程，系统中任何进程都不会启动。init 最主要的功能就是准备软件执行的环境，包括系统的主机名、网络设定、语言、文件系统格式及其他服务的启动等。 而所有的动作都会通过 init的配置文件/etc/inittab来规划，而inittab 内还有一个很重要的设定内容，那就是默认的 runlevel (开机运行级别)。先来看看运行级别Run level,Linux就是通过设定run level来规定系统使用不同的服务来启动，让Linux的使用环境不同。我们来看看这个inittab文件里面的支持级别。
+
+   ```shell
+   # inittab is only used by upstart for the default runlevel.
+   #
+   # ADDING OTHER CONFIGURATION HERE WILL HAVE NO EFFECT ON YOUR SYSTEM.
+   #
+   # System initialization is started by /etc/init/rcS.conf
+   #
+   # Individual runlevels are started by /etc/init/rc.conf
+   #
+   # Ctrl-Alt-Delete is handled by /etc/init/control-alt-delete.conf
+   #
+   # Terminal gettys are handled by /etc/init/tty.conf and /etc/init/serial.conf,
+   # with configuration in /etc/sysconfig/init.
+   #
+   # For information on how to write upstart event handlers, or how
+   # upstart works, see init(5), init(8), and initctl(8).
+   #
+   # Default runlevel. The runlevels used are:
+   #   0 - halt (Do NOT set initdefault to this)
+   #   1 - Single user mode
+   #   2 - Multiuser, without NFS (The same as 3, if you do not have networking)
+   #   3 - Full multiuser mode
+   #   4 - unused
+   #   5 - X11
+   #   6 - reboot (Do NOT set initdefault to this)
+   #
+   id:3:initdefault:
+   ```
+
+   inittab配置文件格式和之前老版本CentOS5或者更老版本比有很大改动。Runlevels共七个级别，0表示关机，1表示单用户，2表示没有网络的命令行级别，3命令行级别（大多服务器都用这个级别），4为保留级别，5为图形化级别，6为重启。这个文件中除了最后一行外，其他都为注释行，也就是说最后一行才是关键，它用来指定服务器跑哪个级别，这里除了可以设置2,3,5外其他级别都不能设置。在该文件的前面部分，可以看到很多行都提及到某个配置文件，而所有配置文件都是在/etc/init/目录下。
+
+3. 系统初始化
+
+   系统初始化，就是去执行/etc/init/下的各个配置文件。inittab配置文件中有这么一行 “System initialization is started by /etc/init/rcS.conf” 也就是说系统初始化会先执行/etc/init/rcS.conf 而该配置文件中又有一行 “exec /etc/rc.d/rc.sysinit” 所以，重心又转移到了这个rc.sysinit文件上，它会做如下工作：激活交换分区，检查磁盘，加载硬件模块以及其它一些需要优先执行任务。当rc.sysinit程序执行完毕后，将返回init继续下一步，又到了/etc/init/rc.conf, 在这个配置文件里，最关键的一行为 “exec /etc/rc.d/rc RUNLEVEL” 而 RUNLEVEL 是在/etc/inittab中定义的(最下面的那一行)，以阿铭的/etc/inittab为例，表示$RUNLEVE=3, 所以此时会执行 “/etc/rc.d/rc 3” 此时实际上是把/etc/rc.d/rc3.d/ 下的脚本都给执行了，随后/etc/rc.d/rc.local也会被执行，通常我们会把开机启动执行的命令放到这个脚本下。服务执行完，系统初始化也就完成了。接下来该建立终端了。
+
+4. 建立终端
+
+   建立终端是由配置文件/etc/init/tty.conf, /etc/init/serial.conf和/etc/sysconfig/init等配置文件来完成的。在2、3、4、5的运行级别中都将以respawn方式运行mingetty程序，mingetty程序能打开终端、设置模式。同时它会显示一个文本登录界面，这个界面就是我们经常看到的登录界面，在这个登录界面中会提示用户输入用户名，而用户输入的用户将作为参数传给login程序来验证用户身份。
+
+5. 用户登录系统
+
+   对于运行级别为5的图形方式用户来说，他们的登录是通过一个图形化的登录界面。登录成功后可以直接进入KDE、Gnome等窗口管理器。而本文主要讲的还是文本方式登录的情况：当我们看到mingetty的登录界面时，我们就可以输入用户名和密码来登录系统了。
+
+   Linux的账号验证程序是login，login会接收mingetty传来的用户名作为用户名参数。然后login会对用户名进行分析：如果用户名不是root，且存在 “/etc/nologin” 文件，login将输出nologin文件的内容，然后退出。这通常用来系统维护时防止非root用户登录。只有 “/etc/securetty” 中登记了的终端才允许root用户登录，如果不存在这个文件，则root可以在任何终端上登录。”/etc/usertty” 文件用于对用户作出附加访问限制，如果不存在这个文件，则没有其他限制。
+
+   在分析完用户名后，login将搜索 “/etc/passwd” 以及 “/etc/shadow” 来验证密码以及设置账户的其它信息，比如：主目录是什么、使用何种shell。如果没有指定主目录，将默认为根目录；如果没有指定shell，将默认为 “/bin/bash”。
+
+   login程序成功后，会向对应的终端在输出最近一次登录的信息(在 “/var/log/lastlog” 中有记录)，并检查用户是否有新邮件(在 “/usr/spool/mail/” 的对应用户名目录下)。然后开始设置各种环境变量：对于bash来说，系统首先寻找 “/etc/profile” 脚本文件，并执行它；然后如果用户的主目录中存在 .bash_profile 文件，就执行它（在这个文件中有执行.bashrc的脚本），在这些文件中又可能调用了其它配置文件，所有的配置文件执行后后，各种环境变量也设好了，这时会出现大家熟悉的命令行提示符，到此整个启动过程就结束了。
+
+**执行顺序：`/etc/profile` -> `~/.bash_profile` -> `~/.bashrc` -> `/etc/bashrc` -> `~/.bash_logout`**
 
 
 
@@ -1275,6 +1360,336 @@ fuser -m /mnt 无法获取 /proc/4110/fd/255 的文件状态: 失效文件句柄
   ```
 
   
+
+### Linux 常用服务安装管理
+
+#### CentOS 7.5 环境开启 Samba 服务
+
+> 环境说明：
+>
+> 两台 CentOS 7.5 的服务器节点，需要将一台服务器的目录共享给另外一台。
+>
+> 挂载端：即需要被共享的目录所在的节点，也就是需要开启 Smb 服务的节点，假设 IP：172.168.1.100，需要共享的目录为：/home/aaa/output，该目录用户属组为：aaa:users
+>
+> 被挂载端：即需要执行挂载命令的节点。假设IP：172.168.1.101，被挂载的目录为：/home/bbb/input，该目录的用户属组为：bbb:users
+>
+> 难点：两个节点的共享及被共享目录均非 root 用户，且不允许讲相关共享目录权限修改为 root，这就要求对 Samba 挂载的权限有足够的了解，否则即使挂载成功，也很可能出现无权限读写的问题
+
+##### 一、挂载端操作【被挂载端的 root 用户下执行】
+
+修改 Samba 服务配置
+
+```shell
+vim /etc/samba/smb.conf
+======== 确认如下内容 =========
+[global] 配置组的：security 配置项，值为：user，如果不是，请修改
+
+======== 添加如下内容 =========
+[share]    
+        comment = All users
+        path = /home/aaa/output
+        read only = no
+        inherit acls = Yes
+        veto files = /aquota.user/groups/shares/
+======== 部分配置说明 =========
+[share]：共享配置别名，可根据需要修改，该别名会在执行 mount 命令时用到
+path：要共享的目录路径，请填写绝对路径
+read only：是否只读，配置为 no，表示可读可写
+```
+
+重启 Samba 服务
+
+```shell
+systemctl restart smb.service
+```
+
+确认服务已运行
+
+```shell
+systemctl status smb.service
+```
+
+确认共享目录读取正常
+
+```shell
+testparm
+======== 如果有返回如下内容，即表示读取正常 ========
+Processing section "[share]"
+Loaded services file OK.
+```
+
+将共享目录的所属用户，添加为 Samba 用户（如果有多个不同用户属组的目录需要共享，则请添加多个 Samba 用户）
+
+```shell
+smbpasswd -a aaa
+# 根据提示，输入两遍密码即可，这个密码可以与操作系统的用户密码相同，也可以不同，建议设置相同的密码
+======== 如果最后返回如下内容，即表示添加成功 ========
+Added user aaa.
+```
+
+
+
+##### 二、被挂载端操作【在挂载端 root 用户下执行】
+
+> 首先必须确保被挂载端节点能正常通过网络访问挂载端节点
+
+查看 `bbb` 用户的 `uid` 及 `gid`
+
+```shell
+id bbb
+========= 会返回如下内容，我们主要取 uid 和 gid 两项 ========
+uid=1013(bbb) gid=100(users) groups=100(users)
+```
+
+执行命令，进行挂载
+
+```shell
+mount -t cifs //172.168.1.100/share /home/bbb/input/ -orw,uid=1013,gid=100,username=aaa,password=aaa
+
+========= 命令参数解析 ========
+mount -t cifs //[remote_ip]/[samba_share_name] [local_path] -orw,uid=[local_user_id],gid=[local_group_id],username=[remote_username],password=[remote_user_password]
+[remote_ip]：远端节点 IP，即挂载端节点的 IP，我们这里是：172.168.1.100
+[samba_share_name]：samba 共享目录别名，即我们在第一节，修改/etc/samba/smb.conf时，添加的那个别名，我们这里是：share
+[local_path]：本地目录路径，即被挂载的目录路径，我们这里是：/home/bbb/input/
+-orw：表示给予读写权限
+[local_user_id]：本地用户的 uid，即我们前一步查询的用户 uid，我们这里是：1013
+[local_group_id]：本地用户的 gid，即我们前一步查询的用户 gid，我们这里是：100
+[remote_username]：远端共享目录用户名，即我们在第一节最后，使用 smbpasswd 命令添加的用户名
+[remote_user_password]：远端共享目录用户密码，即我们在第一节最后，使用 smbpasswd 命令设置的用户密码
+```
+
+检查挂载是否成功
+
+```shell
+df -h
+```
+
+
+
+##### 三、检查用户权限是否有问题
+
+分别登录挂载端的 `aaa` 用户，以及被挂载端的 `bbb` 用户，在挂载的目录下，执行文件/文件夹的增删改等操作，确认是否可以正常执行，如果可以正常执行，即表示权限没有问题
+
+
+
+#### CentOS 7.5 下安装 Python 3
+
+> Python 版本：3.10.0
+>
+> 环境介绍：操作系统：CentOS 7.5，已存在 Python2.7 环境，要求 2.7 与 3.10 共存
+
+##### 上传版本包
+
+获取 `Python-3.10.0.tgz` 、`openssl-1.1.1k.tar.gz` 安装包，并上传到 `/home/package` 用户下解压
+
+```shell
+tar zxvf Python-3.10.0.tgz
+tar zxvf openssl-1.1.1k.tar.gz
+```
+
+
+
+##### 安装依赖环境
+
+```shell
+yum install -y openssl-devel bzip2-devel expat-devel gdbm-devel readline-devel zlib-devel libffi-devel
+```
+
+
+
+##### 安装 OpenSSL 依赖环境
+
+Python 3.10 需要 1.1.1 及以上版本的 OpenSSL 版本，默认 CentOS 7.5 的 OpenSSL 版本为 1.0.1，需要手动安装升级。如果不确定自己环境的 OpenSSL 版本，可以执行命令查询
+
+```shell
+openssl version
+```
+
+编译安装
+
+```shell
+cd openssl-1.1.1k/
+./config --prefix=/usr/local/openssl
+make
+make install
+```
+
+替换默认 openssl 环境
+
+```shell
+mv /usr/bin/openssl /usr/bin/openssl_bak
+mv /usr/include/openssl/ /usr/include/openssl_bak
+ln -s /usr/local/openssl/include/openssl/ /usr/include/openssl
+ln -s /usr/local/openssl/lib/libssl.so.1.1 /usr/local/lib64/libssl.so
+ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl
+echo "/usr/local/openssl/lib" >> /etc/ld.so.conf
+ldconfig -v
+```
+
+最后验证 OpenSSL 版本
+
+```shell
+openssl version
+```
+
+
+
+##### 安装 Python
+
+```
+cd Python-3.10.0
+./configure --prefix=/usr/local/ --with-openssl=/usr/local/openssl
+make
+make install
+```
+
+验证版本
+
+```shell
+python3 --version
+whereis python3
+```
+
+> 由于需要 python2 和 3 共存，因此不需要对 python 命令的默认软链接进行修改。
+
+
+
+
+
+### 记一次 CentOS 7 系统盘分区调整
+
+有一台服务器因为安装人员的失误，导致 `root`根目录只分配了 50G，而`/home` 目录分配了 10T+，这明显是非常不合理的，因此，需要把 `home` 的容量抠出来，给 `root` 使用
+
+```
+lvremove /dev/mapper/centos-home 
+lvextend -L +1024G /dev/mapper/centos-root 
+lvcreate -L 1024G -n home centos
+mkfs.xfs /dev/mapper/centos-home 
+xfs_growfs /dev/mapper/centos-root 
+vim /etc/fstab
+mount /dev/mapper/centos-home 
+df -h
+```
+
+
+
+### 两台服务器之间偶现网络连接异常的问题排查记录
+
+> 均为标准服务器，均使用 CentOS7.5
+
+
+
+#### 背景
+
+某项目在执行机房搬迁时，更换了 IP，但在启动上层业务时，频繁报 `拒绝连接` 的错误，但又不是每次都报，有时可以正常运行。
+
+
+
+#### 排查过程
+
+1. 在初步排查时，发现上层业务报拒绝连接时，ssh 也无法正常连接，报`connect refused`，但可以 ping 通。
+
+2. 深入排查发现这种情况仅限于服务器节点 A，当时有四个节点，A | B | C | D，BCD直接可以互相通信，没有任何问题，但诡异在，A和B之间无法连接，但A和CD之间可以正常访问。
+
+   此时，就可以确定一些问题结果，缩小问题范围：
+
+   - A 节点的 ssh 服务没有问题，否则不会是这种偶现，且不全面的无法连接，但为了确保，还是检查了相关内容文件，没有发现问题
+
+     ```
+     cat /etc/ssh/ssh_config
+     systemctl status ssh
+     ```
+
+     
+
+   - A 节点的 IP 和 hosts 配置没有问题，但也检查了这两部分
+
+     ```shell
+     ifconfig
+     cat /etc/sysconfig/network-scripts/ifcfg-xxxxxxx
+     cat /etc/hosts
+     ```
+
+     
+
+   - 物理连接，即网线网口这些也不太可能，虽然网线松动可能会导致偶现的连接问题，但同一时间所有节点的连接应该是都连接不上，事实是不仅时间上偶现，空间上也偶现
+
+     
+
+   - 机房网络配置问题，比如防火墙，信任清单等，正常情况下，这类配置也应该是全阻断的，不会出现偶现的情况，但就以前的经验，确实会存在一些奇葩的安全防护产品，会出现这种问题
+
+     
+
+3. 为了进一步缩小问题原因，决定抓包，在 A B 服务器之间抓包
+
+   ```shell
+   # 在 A、B 服务器上起抓包命令
+   tcpdump -i 网卡名 -w A.pcap
+   tcpdump -i 网卡名 -w B.pcap
+   
+   # 然后 A ssh B，再 B ssh A
+   
+   # 最后停掉 A、B 上的抓包命令，获取两个抓包文件，通过 wireshark 分析
+   ```
+
+   
+
+4. 通过分析抓包结果，发现 B 在 ssh A 时，B发送的 mac 地址并非 A 的网卡 mac 地址，这时基本确定了问题原因是 IP 冲突
+
+   ```shell
+   # 查看本机 mac 的命令
+   ifconfig
+   ```
+
+   
+
+5. 接着，查看各节点的 arp 表，确认 A 节点的 IP Mac 对应是否正确
+
+   ```shell
+   # 查看本机所有 arp 表信息
+   arp -a
+   ```
+
+   发现在 B 节点上，A 节点的 arp 信息确实不对，此时，确认了问题原因系 IP 冲突
+
+   
+
+6. 于是，通过在 B 节点上，绑定 A 节点的 arp 信息，来临时解决该问题
+
+   ```shell
+   # 方法一
+       # 新增 IP Mac 对应关系文件
+       vim /etc/ip-mac
+       ===== 添加如下内容 =====
+       1.1.1.1 aa:aa:aa:aa:aa
+       # 激活这个文件
+       arp -f /etc/ip-mac
+       
+   # 方法二
+   	arp -s 1.1.1.1 aa:aa:aa:aa:aa
+   	
+   # 手动绑定的 arp 信息，在服务器重启后，就会丢失，因此，如果无法解决 IP 冲突的问题，必须要手动绑定 arp，则可以通过以下命令添加到开机自启动
+   	# 方法一对应的操作
+   	echo 'arp -f /etc/ip-mac' /etc/rc.local
+   	# 方法二对应的操作
+   	echo 'arp -s 1.1.1.1 aa:aa:aa:aa:aa' /etc/rc.local
+   ```
+
+   > arp 相关拓展：http://blog.sina.com.cn/s/blog_809ff62a0102wzau.html   |   https://blog.csdn.net/weixin_39620984/article/details/116615225
+   >
+   > arp 的注意事项：如果因 IP 冲突而需要添加 arp，则建议将此方法作为一个临时解决方法，正式的解决方法是排除掉重复的 IP，手动添加 arp 会导致该目的节点的 arp 信息不再会自动学习，一旦目的节点的网卡更换，更新了 mac，则会因为 arp 无法自动更新，导致连接再次异常
+
+
+
+#### 总结
+
+实际上，整个过程中，抓包和查看 arp 最终实锤了 IP 冲突的问题。
+
+但仅就问题现象上，也可以基本推断出 IP 冲突的可能性：**时间偶现和空间偶现，即同一时间不同节点出现部分节点连接正常，部分连接异常；同一对节点，有时连得上，有时连不上**，以后出现这种现象，大概率是 IP 冲突，可以优先使用 arp 命令进行实锤或排除。
+
+但也不排除有其他可能性，比如上文说到的“奇怪的安全策略”。
+
+
 
 
 
