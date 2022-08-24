@@ -1,5 +1,120 @@
 # Handbook
 
+## 服务器
+
+### 各厂商服务器存储默认管理口登录信息合集
+
+服务器管理口合集：
+
+| 设备类型       | 设备型号                | 默认管理IP                            | 默认用户名    | 默认密码   |
+| -------------- | ----------------------- | ------------------------------------- | ------------- | ---------- |
+| IBM服务器      | IBM P小型机ASMI         | hmc1:192.168.2.147 hmc2:192.168.3.147 | admin         | admin      |
+|                | IBM X系列IMM端口        | 192.168.70.125/24                     | USERID        | PASSW0RD   |
+|                | IBM BCH刀箱管理模块     | 192.168.70.125-126/24                 | USERID        | PASSW0RD   |
+|                | IBM BCH刀箱网络模块     | 192.168.70.127-128/24                 | admin         | admin      |
+|                | IBM BCH刀箱光纤模块     | 192.168.70.129-130/24                 | admin         | pasword    |
+|                | IBM pureFlexCMM模块     | 192.168.70.100                        | USERID        | PASSW0RD   |
+| 华为服务器     | E6000                   | 10.10.1.101-10.10.1.110               | root          | Huawei12#$ |
+|                | RH2288 v3系列           | 192.168.2.100                         | root          | Huawei12#$ |
+|                | RH2288 v5系列           | 192.168.2.100                         | Administrator | Admin@9000 |
+|                | T6000                   | 10.10.1.101-10.10.1.102               | root          | Huawei12#$ |
+|                | X6000                   | 10.10.1.101-10.10.1.104               | root          | Huawei12#$ |
+| 华为鲲鹏服务器 | TaiShan 200             | 192.168.2.100/24                      | Administrator | Admin@9000 |
+|                | TaiShan 100             | 192.168.2.100/24                      | root          | Huawei12#$ |
+| 浪潮服务器     | NF5270M4                | 手动配置                              | admin         | admin      |
+|                | NF8560M2                | 192.168.1.100                         | ADMIN         | ADMIN      |
+| H3C服务器      | R4900 G2/G3             | HDM：192.168.1.2/24                   | admin         | Password@_ |
+|                | B16000                  | 192.168.100.100/24                    | admin         | Password@_ |
+| Dell服务器     | IDRAC                   | 192.168.0.120                         | root          | calvin     |
+| 联想服务器     | RQ940                   | 192.168.0.120                         | admin         | admin      |
+|                | RD530/RD630/RD540/RD640 | 手动设置                              | lenovo        | len0vO     |
+|                | 万全R520                | 手动设置                              | lenovo        | lenovo     |
+|                | ThinkSystem SR850       | 手动设置                              | USERID        | PASSW0RD   |
+| 曙光服务器     | I840-G25                | 手动设置                              | admin         | admin      |
+
+存储管理口合集：
+
+| 设备类型     | 设备型号                                                     | 默认管理IP                                                   | 默认用户名                                  | 默认密码      |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------- | ------------- |
+| IBM存储      | DS存储                                                       | port1 A控192.168.128.101/24<br>port1 B控192.168.128.102/24<br/>port2 A控192.168.129.101/24<br/>port2 B控192.168.129.102/24 | 用IBM DS Storage Manager Client管理软件连接 |               |
+|              | v5030                                                        | T口：192.168.0.1                                             | superuser                                   | passw0rd      |
+|              | V7000                                                        | 上 192.168.70.121<br/>下 192.168.70.122                      | superuser                                   | passw0rd      |
+|              |                                                              |                                                              |                                             |               |
+| 华为存储     | OceanStor 5300 V3/5500     V3(V300R003C00/V300R003C10版本)   | A管理口：192.168.128.101/24     B管理口：192.168.128.102/24  | admin                                       | Admin@storage |
+|              | OceanStor 5300 V3/5500     V3(V300R003C20版本)               | A管理口：192.168.128.101/16     B管理口：192.168.128.102/16  | admin                                       | Admin@storage |
+|              | OceanStor 5600 V3/5800 V3/6800  V3(V300R003C00/V300R003C10版本) | A管理口：192.168.128.101/16     B管理口：192.168.128.102/16  | admin                                       | Admin@storage |
+|              | OceanStor 5600 V3/5800 V3/6800 V3(V300R003C20版本)           | A管理口：192.168.128.101/16     B管理口：192.168.128.102/16  | admin                                       | Admin@storage |
+|              | 以上默认的内部心跳IP                                         | 双控：127.127.127.10-11/24     四控：127.127.127.10-13/24    |                                             |               |
+|              | 以上维护网口IP                                               | 172.31.128.101/16     172.31.128.102/16                      |                                             |               |
+| 华赛存储     | S1200                                                        | 192.168.168.1                                                | root                                        | password      |
+|              | V1000/S500                                                   | 192.168.128.101-102/24                                       | admin                                       | 123456        |
+| Dell存储     | MD3600                                                       | 192.168.128.101/102                                          | 用DELL MDSM软件连接                         |               |
+| Lenovo EMC   | 5100                                                         | 1.1.1.1/1.1.1.2                                              | root                                        | lenovo        |
+| 非Lenovo EMC | VNX5700                                                      | 1.1.1.1/1.1.1.2                                              | sysadmin                                    | sysadmin      |
+| 曙光存储     | DS800-G35                                                    | 192.168.0.210/192.168.0.220                                  | admin                                       | admin         |
+| 宏杉存储     | MS系列                                                       | 192.168.0.210/192.168.0.220                                  | admin                                       | admin         |
+| 同有存储     | NetStor iSUM450G2                                            | 192.168.0.200                                                | administator                                | password      |
+
+光纤交换机管理口合集：
+
+| 设备类型 | 设备型号    | 默认管理IP  | 默认用户名 | 默认密码 |
+| -------- | ----------- | ----------- | ---------- | -------- |
+| 博科     | Brocade通用 | 10.77.77.77 | admin      | password |
+
+
+
+### 浪潮服务器管理口地址设置
+
+- **NF5240m3/NF5140m3/NF5280m3/SA5212H2/NP5540M3/NF5270M3/NF5170M3/NF8420m3**
+
+  IPMI主板集成管理芯片BMC IP 设置
+
+  开机按DEL键进入BIOS设置
+
+  选择"Server Mgmt"---"BMC Network Configuration"---"lan channel 1/2"---"static ip address"
+
+  lan channel 1:指的是复用管理网口，网卡1接口
+
+  lan channel 2:指的是IPMI管理专用接口，一般需要设置这个接口
+
+- **NF8560M2/NF8560M/NF8560**
+
+  集成IPMI管理卡IP地址可以在BIOS中“Advanced"---"IPMI Configuration"---"Set LAN Configuration"---"IP Address"---"[static](https://so.csdn.net/so/search?q=static&spm=1001.2101.3001.7020)"菜单中查看和设置
+
+  说明：NF8560M2出厂时主板集成的IPMI管理卡IP地址默认为：192.168.1.100
+
+  如果重新更改了IP地址，保存后，还需要对服务器进行重新启动或断电(拔下电源线)操作后才能正常使用。
+
+- **NF5220/NF5120/NF5225/NF5280M2**
+
+  IPMI主板集成管理芯片BMC IP 设置
+
+  开机按DEL键进入BIOS设置
+
+  选择"Server Mgmt"---"BMC Network Configuration"---"lan channel 1/2"---"static ip address"
+
+  lan channel 1:指的是复用管理网口，网卡1接口
+
+  lan channel 2:指的是IPMI管理专用接口，一般需要设置这个接口
+
+- **NF5270M4/NF5280M4**
+
+  IPMI主板集成管理芯片BMC IP 设置
+
+  开机按DEL键进入BIOS设置
+
+  选择"Server Mgmt"---"BMC Network Configuration"---"Configuration address source"---"statically or dynamically"
+
+  BMC Sharelink Management Channel:指的是复用管理网口，网卡1接口
+
+  BMC Dedicated Management Channel:指的是IPMI管理专用接口，一般需要设置这个接口
+
+- **NF8460M3**
+
+  请使用用户名：root 密码：superuser 或用户名：ADMIN 密码：ADMIN
+
+
+
 ## Linux
 
 - 查看 Java 程序堆内存使用情况
