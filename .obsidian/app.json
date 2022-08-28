@@ -1,0 +1,10 @@
+{
+  "promptDelete": false,
+  "alwaysUpdateLinks": false,
+  "useMarkdownLinks": true,
+  "readableLineLength": false,
+  "showFrontmatter": false,
+  "showLineNumber": true,
+  "useTab": false,
+  "tabSize": 2
+}
